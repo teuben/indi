@@ -44,7 +44,10 @@ const char* names[20];
 
 HANDLE handles[20];
 struct t_sxccd_params params;
-unsigned short pixels[10*10];
+
+#define NX  10
+#define NY  10
+unsigned short pixels[NX*NY];
 
 int main() {
   int i;
@@ -52,7 +55,7 @@ int main() {
   unsigned short us;
   unsigned long ul;
 
-	sxDebug(true);
+  sxDebug(true);
 
   cout << "sx_ccd_test version " << VERSION_MAJOR << "." << VERSION_MINOR << endl << endl;
   n = sxList(devices, names, 20);
@@ -65,6 +68,7 @@ int main() {
 
     i = sxOpen(devices[j], &handle);
     cout << "sxOpen() -> " << i << endl << endl;
+    cout << "  handle:" << handle << endl;
 
     //i = sxReset(handle);
     //cout << "sxReset() -> " << i << endl << endl;
@@ -111,19 +115,24 @@ int main() {
     cout << "sxClearPixels(..., 0) -> " << i << endl << endl;
 
     usleep(1000);
-
-    i = sxLatchPixels(handle, 0, 0, 0, 0, 10, 10, 1, 1);
+    //                             x0 y0   W   H xb yb
+    i = sxLatchPixels(handle, 0, 0, 0, 0, NX, NY, 1, 1);
     cout << "sxLatchPixels(..., 0, ...) -> " << i << endl << endl;
 
-    i = sxReadPixels(handle, pixels, 2*10*10);
+    i = sxReadPixels(handle, pixels, 2*NX*NY);
     cout << "sxReadPixels() -> " << i << endl << endl;
 
-    for (int x=0; x<10; x++) {
-      for (int y=0; y<10; y++)
-        cout << pixels[x*10+y] << " ";
+    cout << "P2" << endl;       
+    cout << NX << " " << NY << endl;
+    cout << "65535" << endl;
+
+    for (int y=0; y<NY; y++) {
+      for (int x=0; x<NX; x++)
+        cout << pixels[x*NY+y] << " ";
       cout << endl;
     }
     cout << endl;
+    cout << "P2-end" << endl;
 
     if (params.extra_caps & SXCCD_CAPS_GUIDER) {
       memset(&params, 0, sizeof(params));
@@ -135,15 +144,15 @@ int main() {
 
       usleep(1000);
 
-      i = sxLatchPixels(handle, 0, 1, 0, 0, 10, 10, 1, 1);
+      i = sxLatchPixels(handle, 0, 1, 0, 0, NX, NY, 1, 1);
       cout << "sxLatchPixels(..., 1, ...) -> " << i << endl << endl;
 
-      i = sxReadPixels(handle, pixels, 10*10);
+      i = sxReadPixels(handle, pixels, NX*NY);   //  is that really NX*NY, and not 2*NX*NY ?
       cout << "sxReadPixels() -> " << i << endl << endl;
 
-      for (int x=0; x<10; x++) {
-        for (int y=0; y<10; y++)
-          cout << pixels[x*10+y] << " ";
+      for (int y=0; y<NY; y++) {
+	for (int x=0; x<NX; x++)
+          cout << pixels[x*NY+y] << " ";
         cout << endl;
       }
       cout << endl;
