@@ -49,6 +49,8 @@ struct t_sxccd_params params;
 #define NY  10
 unsigned short pixels[NX*NY];
 
+int use_P2 = 1;   // set to 0 if you don't want the P2 header info for a PGM header descriptor 
+
 int main() {
   int i;
   unsigned int ui;
@@ -119,12 +121,14 @@ int main() {
     i = sxLatchPixels(handle, 0, 0, 0, 0, NX, NY, 1, 1);
     cout << "sxLatchPixels(..., 0, ...) -> " << i << endl << endl;
 
-    i = sxReadPixels(handle, pixels, 2*NX*NY);
+    i = sxReadPixels(handle, pixels, 2*NX*NY);     //  16bit/pixel data (camindex = 0)
     cout << "sxReadPixels() -> " << i << endl << endl;
 
-    cout << "P2" << endl;       
-    cout << NX << " " << NY << endl;
-    cout << "65535" << endl;
+    if (use_P2) {
+      cout << "P2" << endl;       
+      cout << NX << " " << NY << endl;
+      cout << "65535" << endl;
+    }
 
     for (int y=0; y<NY; y++) {
       for (int x=0; x<NX; x++)
@@ -132,7 +136,7 @@ int main() {
       cout << endl;
     }
     cout << endl;
-    cout << "P2-end" << endl;
+    if (use_P2) cout << "P2-end" << endl;
 
     if (params.extra_caps & SXCCD_CAPS_GUIDER) {
       memset(&params, 0, sizeof(params));
@@ -147,7 +151,7 @@ int main() {
       i = sxLatchPixels(handle, 0, 1, 0, 0, NX, NY, 1, 1);
       cout << "sxLatchPixels(..., 1, ...) -> " << i << endl << endl;
 
-      i = sxReadPixels(handle, pixels, NX*NY);   //  is that really NX*NY, and not 2*NX*NY ?
+      i = sxReadPixels(handle, pixels, NX*NY);   //  8bit/pixel guider head (camindex = 1)
       cout << "sxReadPixels() -> " << i << endl << endl;
 
       for (int y=0; y<NY; y++) {
