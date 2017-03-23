@@ -49,7 +49,7 @@ struct t_sxccd_params params;
 #define NY  10
 unsigned short pixels[NX*NY];
 
-int use_P2 = 1;   // set to 0 if you don't want the P2 header info for a PGM header descriptor 
+int use_P2 = 1;   // set to 0 if you don't want the P2 header info for a PGM header descriptor.
 
 int main() {
   int i;
